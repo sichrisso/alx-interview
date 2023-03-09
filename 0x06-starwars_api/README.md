@@ -1,2 +1,1 @@
-# Star Wars API
-
+# 0-starwars_characters.js
