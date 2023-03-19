@@ -1,48 +1,59 @@
-class Solution:
-    def solveNQueens(self, n: int) -> List[List[str]]:
-        output = []
-
-        #intialize the board
-        board = [['.']*n for i in range(n)]
-
-        #create a hash map of column, row , diagonal left and right in order to see if the queens can attack each other.
-        queenColumn = {}
-        queenRow = {}
-        queenDiagonalLeft = {}
-        queenDiagonalRight = {}
-
-        #validate the row,column and diagonal before putting a queen
-        def valid(row, col):
-            return not (row in queenRow or col in queenColumn or row + col in queenDiagonalLeft or row - col in queenDiagonalRight)
-
-        
-        def backtrack(row):
-            #base case if we finish the board we have found a way to put all the queens
-            if row == n:
-                newBoard = []
-                for i in range(n):
-                    newBoard.append(''.join(board[i]))
-                output.append(newBoard)
-                return
-
-            #iteratively put and backtrack the queens
-            for i in range(n):
-                if valid(row,i):
-                    queenColumn[i] = True
-                    queenRow[row] = True
-                    queenDiagonalLeft[row+i] = True
-                    queenDiagonalRight[row-i] = True
-                    board[row][i] = 'Q'
-
-                    backtrack(row+1)
-
-                    board[row][i] = '.'
-                    queenColumn.pop(i)
-                    queenRow.pop(row)
-                    queenDiagonalLeft.pop(row+i)
-                    queenDiagonalRight.pop(row-i)
+#!/usr/bin/python3
+"""N Queens"""
+import sys
 
 
-        backtrack(0)
+def print_board(board, n):
+    """Print allocated positions to the queen"""
+    b = []
 
-        return output
+    for i in range(n):
+        for j in range(n):
+            if j == board[i]:
+                b.append([i, j])
+    print(b)
+
+
+def is_position_safe(board, i, j, r):
+    """Checks if the position is safe for the queen"""
+    return board[i] in (j, j - i + r, i - r + j)
+
+
+def safe_positions(board, row, n):
+    """Find all safe positions where the queen can be allocated"""
+    if row == n:
+        print_board(board, n)
+
+    else:
+        for j in range(n):
+            allowed = True
+            for i in range(row):
+                if is_position_safe(board, i, j, row):
+                    allowed = False
+            if allowed:
+                board[row] = j
+                safe_positions(board, row + 1, n)
+
+
+def create_board(size):
+    """Generates the board"""
+    return [0 * size for i in range(size)]
+
+
+if len(sys.argv) != 2:
+    print("Usage: nqueens N")
+    exit(1)
+
+try:
+    n = int(sys.argv[1])
+except BaseException:
+    print("N must be a number")
+    exit(1)
+
+if (n < 4):
+    print("N must be at least 4")
+    exit(1)
+
+board = create_board(int(n))
+row = 0
+safe_positions(board, row, int(n))
